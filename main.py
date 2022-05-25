@@ -8,7 +8,7 @@ import time
 
 snakeMovements = {'L':[-1,0],'R':[1,0],'D':[0,-1],'U':[0,1]}
 
-VISUALIZATION = False
+VISUALIZATION = True
 totalValidMovements = []
 
 
@@ -35,18 +35,7 @@ class snakeGame(object):
 
                 raise IndexError(f"Board definition unsuccessful, {dimension} out of range")
         
-        if VISUALIZATION == True:
-                print('Snake',snake)
-                print('Board',board)
-                print('Depth', currDepth)
-
-                for x in range(board[0]):
-                    for y in range(board[1]):
-                        if [x,y] in snake:
-                            print('X', end=" ")
-                        else:
-                            print('-', end=" ")
-                    print('\n')
+        
          
 
        
@@ -54,6 +43,9 @@ class snakeGame(object):
         
         validMovements = []
         invalidMovements = []
+
+
+
 
         #Pushing an if condition to check depth and prevent reccursion limit override
         if len(snake) > 0 and currDepth<depth:
@@ -74,59 +66,63 @@ so the head could potentially take the place of the tail.
             for key in snakeMovements:
                 possibleFirstSteps.append([snake[0][0]+snakeMovements[key[0]][0],snake[0][1]+snakeMovements[key[0]][1]])
 
-            """
-                for element in snake:
-                    sampleList.append([element[0]+snakeMovements[key][0],element[1]+snakeMovements[key][1]])
-
-                totalSnakePossibleMovements.append(sampleList)
-                """
             
             #Getting all possible (l,r,d,u) snake movements for defined snake 
-            
+
+
             for step in possibleFirstSteps:
 
                 tempList = []
                 tempList.append(step)
-                for x in range(3):
+
+                for x in range(len(snake)-1):
                     tempList.append(snake[x])
                 totalSnakePossibleMovements.append(tempList)
 
             for element in totalSnakePossibleMovements:
+                unique_data = [list(x) for x in set(tuple(x) for x in element)]
                 if element[0][0] > 0 and element[0][0] < board[0] + 1 and element[0][1] > 0 and element[0][1] < board[1]+1:
-                    validMovements.append(element)
+                    if len(unique_data) == len(snake):
+                        validMovements.append(element)
+                    
 
             for element in validMovements:
                 totalValidMovements.append([element,currDepth+1])
-                currDepth = currDepth+1
-                self.snakeMovementAction(element,board,currDepth,depth)
+                self.snakeMovementAction(element,board,currDepth+1,depth)
+                
+
+    def numberOfAvailableDifferentPaths(self):
+
+        board = self.board
+        snake = self.snake
+        depth = self.depth
+
+        self.snakeMovementAction(snake,board,0,depth)
+
+        validPathsNum = 0
+        for movement in totalValidMovements:
+            if movement[-1] == depth:
+                print(movement)
+                validPathsNum += 1
+
+                if VISUALIZATION == True:
+                    print('Depth', depth)
+
+                    counterMovement = 0
+                    for x in range(1,board[0]+1):
+                        for y in range(1,board[1]+1):
+                            if [x,y] in movement[0]:
+                                print(movement[0].index([x,y]), end=" ")
+                                counterMovement += 1
+                            else:
+                                print('-', end=" ")
+                        print('\n')
                 
 
         
-
-            
-            
-            
-            
-
-            
-            
-            
+        
+        
+        print('Number of valid paths:',validPathsNum)
+        return validPathsNum
 
 
-
-sampleSnake = [[5,5], [5,4], [4,4], [4,5]]
-sampleBoard = [10,10]
-sampleSnakeGame = snakeGame(sampleBoard,sampleSnake,4)
-sampleSnakeGame.snakeMovementAction(sampleSnake,sampleBoard,0,4)
-print(totalValidMovements)
-print(len(totalValidMovements))
-"""
-
-listTempstime = [[[[2, 1], [3, 1], [3, 0], [3, -1], [2, -1], [1, -1], [0, -1]], 1], [[[1, 1], [2, 1], [2, 0], [2, -1], [1, -1], [0, -1], [-1, -1]], 2], [[[0, 1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1], [-2, -1]], 3], [[[2, 1], [3, 1], [3, 0], [3, -1], [2, -1], [1, -1], [0, -1]], 4], [[[2, 1], [3, 1], [3, 0], [3, -1], [2, -1], [1, -1], [0, -1]], 5], [[[2, 1], [3, 1], [3, 0], [3, -1], [2, -1], [1, -1], [0, -1]], 6], [[[1, 0], [2, 0], [2, -1], [2, -2], [1, -2], [0, -2], [-1, -2]], 7], [[[1, 0], [2, 0], [2, -1], [2, -2], [1, -2], [0, -2], [-1, -2]], 8], [[[1, 0], [2, 0], [2, -1], [2, -2], [1, -2], [0, -2], [-1, -2]], 9], [[[1, 1], [2, 1], [2, 0], [2, -1], [1, -1], [0, -1], [-1, -1]], 3], [[[3, 1], [4, 1], [4, 0], [4, -1], [3, -1], [2, -1], [1, -1]], 4], [[[3, 1], [4, 1], [4, 0], [4, -1], [3, -1], [2, -1], [1, -1]], 5], [[[3, 1], [4, 1], [4, 0], [4, -1], [3, -1], [2, -1], [1, -1]], 6], [[[2, 0], [3, 0], [3, -1], [3, -2], [2, -2], [1, -2], [0, -2]], 7], [[[2, 0], [3, 0], [3, -1], [3, -2], [2, -2], [1, -2], [0, -2]], 8], [[[2, 0], [3, 0], [3, -1], [3, -2], [2, -2], [1, -2], [0, -2]], 9], [[[2, 0], [3, 0], [3, -1], [3, -2], [2, -2], [1, -2], [0, -2]], 10], [[[2, 1], [3, 1], [3, 0], [3, -1], [2, -1], [1, -1], [0, -1]], 2], [[[1, 1], [2, 1], [2, 0], [2, -1], [1, -1], [0, -1], [-1, -1]], 3], [[[1, 1], [2, 1], [2, 0], [2, -1], [1, -1], [0, -1], [-1, -1]], 4], [[[3, 1], [4, 1], [4, 0], [4, -1], [3, -1], [2, -1], [1, -1]], 5], [[[3, 1], [4, 1], [4, 0], [4, -1], [3, -1], [2, -1], [1, -1]], 6], [[[3, 1], [4, 1], [4, 0], [4, -1], [3, -1], [2, -1], [1, -1]], 7], [[[2, 0], [3, 0], [3, -1], [3, -2], [2, -2], [1, -2], [0, -2]], 8], [[[2, 0], [3, 0], [3, -1], [3, -2], [2, -2], [1, -2], [0, -2]], 9], [[[2, 0], [3, 0], [3, -1], [3, -2], [2, -2], [1, -2], [0, -2]], 10], [[[2, 0], [3, 0], [3, -1], [3, -2], [2, -2], [1, -2], [0, -2]], 11], [[[2, 1], [3, 1], [3, 0], [3, -1], [2, -1], [1, -1], [0, -1]], 3]]
-counter = 0
-
-for x in listTempstime:
-    if x[1] == 3:
-        counter += 1
-
-print(counter)"""
