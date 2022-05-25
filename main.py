@@ -34,18 +34,8 @@ class snakeGame(object):
             if dimension < 1 or dimension > 10:
 
                 raise IndexError(f"Board definition unsuccessful, {dimension} out of range")
-
-         
-
-       
-    def snakeMovementAction(self,snake,board,currDepth,depth):
         
-        
-        invalidMovements = []
-        if len(snake) > 0 and currDepth<depth:
-            
-            #Primary Board visualization
-            if VISUALIZATION == True:
+        if VISUALIZATION == True:
                 print('Snake',snake)
                 print('Board',board)
                 print('Depth', currDepth)
@@ -57,39 +47,59 @@ class snakeGame(object):
                         else:
                             print('-', end=" ")
                     print('\n')
+         
 
-            board = self.board
-            totalSnakePossibleMovements = []
+       
+    def snakeMovementAction(self,snake,board,currDepth,depth):
+        
+        validMovements = []
+        invalidMovements = []
+
+        #Pushing an if condition to check depth and prevent reccursion limit override
+        if len(snake) > 0 and currDepth<depth:
             
-            for key in snakeMovements:
-                sampleList = []
+            board = self.board
+            possibleFirstSteps = []
+            totalSnakePossibleMovements = []
 
+            """
+            On each turn, the snake's head moves to one of the horizontally or vertically adjacent cells,
+the second cell of the snake moves to the cell where the head was situated, the third cell
+takes the former place of the second cell, etc. All these movements happen simultaneously,
+so the head could potentially take the place of the tail.
+            """
+
+
+            #Adding all snake's possible first steps in a list to iterrate between next steps
+            for key in snakeMovements:
+                possibleFirstSteps.append([snake[0][0]+snakeMovements[key[0]][0],snake[0][1]+snakeMovements[key[0]][1]])
+
+            """
                 for element in snake:
                     sampleList.append([element[0]+snakeMovements[key][0],element[1]+snakeMovements[key][1]])
 
                 totalSnakePossibleMovements.append(sampleList)
-                
-            for element in totalSnakePossibleMovements:
-
-                for item_ in element:
-                    if item_[0]<0 or item_[0]>board[0] or item_[1]<0 or item_[1]>board[1]:
-                        invalidMovements.append(element)                          
-                    else:
-                        pass   
-                        
-            counter = 0
-            for element in totalSnakePossibleMovements:
-                if element in invalidMovements:
-                    totalSnakePossibleMovements.remove(element)
+                """
             
-            snakeValidMovements = totalSnakePossibleMovements
+            #Getting all possible (l,r,d,u) snake movements for defined snake 
+            
+            for step in possibleFirstSteps:
 
-            print(len(snakeValidMovements))
-            for element in snakeValidMovements:
-                print(element)
+                tempList = []
+                tempList.append(step)
+                for x in range(3):
+                    tempList.append(snake[x])
+                totalSnakePossibleMovements.append(tempList)
+
+            for element in totalSnakePossibleMovements:
+                if element[0][0] > 0 and element[0][0] < board[0] + 1 and element[0][1] > 0 and element[0][1] < board[1]+1:
+                    validMovements.append(element)
+
+            for element in validMovements:
                 totalValidMovements.append([element,currDepth+1])
                 currDepth = currDepth+1
                 self.snakeMovementAction(element,board,currDepth,depth)
+                
 
         
 
@@ -108,7 +118,8 @@ sampleSnake = [[5,5], [5,4], [4,4], [4,5]]
 sampleBoard = [10,10]
 sampleSnakeGame = snakeGame(sampleBoard,sampleSnake,4)
 sampleSnakeGame.snakeMovementAction(sampleSnake,sampleBoard,0,4)
-
+print(totalValidMovements)
+print(len(totalValidMovements))
 """
 
 listTempstime = [[[[2, 1], [3, 1], [3, 0], [3, -1], [2, -1], [1, -1], [0, -1]], 1], [[[1, 1], [2, 1], [2, 0], [2, -1], [1, -1], [0, -1], [-1, -1]], 2], [[[0, 1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1], [-2, -1]], 3], [[[2, 1], [3, 1], [3, 0], [3, -1], [2, -1], [1, -1], [0, -1]], 4], [[[2, 1], [3, 1], [3, 0], [3, -1], [2, -1], [1, -1], [0, -1]], 5], [[[2, 1], [3, 1], [3, 0], [3, -1], [2, -1], [1, -1], [0, -1]], 6], [[[1, 0], [2, 0], [2, -1], [2, -2], [1, -2], [0, -2], [-1, -2]], 7], [[[1, 0], [2, 0], [2, -1], [2, -2], [1, -2], [0, -2], [-1, -2]], 8], [[[1, 0], [2, 0], [2, -1], [2, -2], [1, -2], [0, -2], [-1, -2]], 9], [[[1, 1], [2, 1], [2, 0], [2, -1], [1, -1], [0, -1], [-1, -1]], 3], [[[3, 1], [4, 1], [4, 0], [4, -1], [3, -1], [2, -1], [1, -1]], 4], [[[3, 1], [4, 1], [4, 0], [4, -1], [3, -1], [2, -1], [1, -1]], 5], [[[3, 1], [4, 1], [4, 0], [4, -1], [3, -1], [2, -1], [1, -1]], 6], [[[2, 0], [3, 0], [3, -1], [3, -2], [2, -2], [1, -2], [0, -2]], 7], [[[2, 0], [3, 0], [3, -1], [3, -2], [2, -2], [1, -2], [0, -2]], 8], [[[2, 0], [3, 0], [3, -1], [3, -2], [2, -2], [1, -2], [0, -2]], 9], [[[2, 0], [3, 0], [3, -1], [3, -2], [2, -2], [1, -2], [0, -2]], 10], [[[2, 1], [3, 1], [3, 0], [3, -1], [2, -1], [1, -1], [0, -1]], 2], [[[1, 1], [2, 1], [2, 0], [2, -1], [1, -1], [0, -1], [-1, -1]], 3], [[[1, 1], [2, 1], [2, 0], [2, -1], [1, -1], [0, -1], [-1, -1]], 4], [[[3, 1], [4, 1], [4, 0], [4, -1], [3, -1], [2, -1], [1, -1]], 5], [[[3, 1], [4, 1], [4, 0], [4, -1], [3, -1], [2, -1], [1, -1]], 6], [[[3, 1], [4, 1], [4, 0], [4, -1], [3, -1], [2, -1], [1, -1]], 7], [[[2, 0], [3, 0], [3, -1], [3, -2], [2, -2], [1, -2], [0, -2]], 8], [[[2, 0], [3, 0], [3, -1], [3, -2], [2, -2], [1, -2], [0, -2]], 9], [[[2, 0], [3, 0], [3, -1], [3, -2], [2, -2], [1, -2], [0, -2]], 10], [[[2, 0], [3, 0], [3, -1], [3, -2], [2, -2], [1, -2], [0, -2]], 11], [[[2, 1], [3, 1], [3, 0], [3, -1], [2, -1], [1, -1], [0, -1]], 3]]
